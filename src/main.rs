@@ -26,7 +26,7 @@ async fn run_code(code: web::Json<CodeRequest>) -> impl Responder {
         _ => return HttpResponse::BadRequest().body("Invaild language!"),
     };
     if code.time_limit == 0 || code.time_limit > 10 {
-        return HttpResponse::BadRequest().body("Timeout must be between 1..10 (seconds)!");
+        return HttpResponse::BadRequest().body("Time limit must be between 1..10 (seconds)!");
     }
     let (status, message) = lang.execute_code(&code.source_code, &code.input, code.time_limit);
     HttpResponse::Ok().json(CodeResponse {
