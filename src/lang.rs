@@ -34,13 +34,15 @@ impl Lang {
     }
 
     fn compile(&self, dir: PathBuf) -> (String, Vec<String>, PathBuf, Status, String) {
+        let mut cmd = Command::new("firejail");
+        cmd.arg("--quiet")
+            .arg("--shell=none")
+            .arg("--noroot")
+            .arg("--net=none")
+            .arg("--private");
+
         let output = match self {
-            Lang::C => Command::new("firejail")
-                .arg("--quiet")
-                .arg("--shell=none")
-                .arg("--noroot")
-                .arg("--net=none")
-                .arg("--private")
+            Lang::C => cmd
                 .arg("gcc")
                 .arg("-o")
                 .arg(format!("{}", dir.with_extension("").to_string_lossy()))
@@ -48,12 +50,7 @@ impl Lang {
                 .current_dir(format!("{}", TMPDIR.to_string_lossy()))
                 .output()
                 .expect("Error occured when compling C!"),
-            Lang::Cpp => Command::new("firejail")
-                .arg("--quiet")
-                .arg("--shell=none")
-                .arg("--noroot")
-                .arg("--net=none")
-                .arg("--private")
+            Lang::Cpp => cmd
                 .arg("g++")
                 .arg("-o")
                 .arg(format!("{}", dir.with_extension("").to_string_lossy()))
@@ -61,24 +58,14 @@ impl Lang {
                 .current_dir(format!("{}", TMPDIR.to_string_lossy()))
                 .output()
                 .expect("Error occured when compling C++!"),
-            Lang::Go => Command::new("firejail")
-                .arg("--quiet")
-                .arg("--shell=none")
-                .arg("--noroot")
-                .arg("--net=none")
-                .arg("--private")
+            Lang::Go => cmd
                 .arg("go")
                 .arg("build")
                 .arg(format!("{}", dir.to_string_lossy()))
                 .current_dir(format!("{}", TMPDIR.to_string_lossy()))
                 .output()
                 .expect("Error occured when compling Golang!"),
-            Lang::Rust => Command::new("firejail")
-                .arg("--quiet")
-                .arg("--shell=none")
-                .arg("--noroot")
-                .arg("--net=none")
-                .arg("--private")
+            Lang::Rust => cmd
                 .arg("rustc")
                 .arg(format!("{}", dir.to_string_lossy()))
                 .current_dir(format!("{}", TMPDIR.to_string_lossy()))
